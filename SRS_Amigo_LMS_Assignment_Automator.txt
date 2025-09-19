@@ -1,0 +1,309 @@
+Software Requirements Specification (SRS)
+Amigo LMS Assignment Automator Chrome Extension
+
+================================================================================
+
+1. Introduction
+================================================================================
+
+1.1 Purpose of this Document
+This Software Requirements Specification (SRS) document outlines the comprehensive requirements for the Amigo LMS Assignment Automator Chrome Extension. The document serves as a contract between the development team and the end user, providing a detailed roadmap for creating an automated solution that streamlines the completion of assignments, quizzes, and course content on the Amigo Learning Management System (LMS). The primary purpose is to eliminate manual repetitive tasks, reduce time consumption, and ensure consistent completion of academic coursework while maintaining the integrity of the learning process.
+
+1.2 Scope of this Document
+This document encompasses the complete functionality of a Chrome browser extension designed to automate various tasks within the Amigo LMS platform. The scope includes automated navigation through course content, intelligent quiz completion, assignment submission, progress tracking, and user preference management. The development cost is estimated at 40-60 hours of development time, with an expected completion timeline of 2-3 weeks for a fully functional prototype and 4-6 weeks for a production-ready version with comprehensive testing and optimization.
+
+1.3 Overview
+The Amigo LMS Assignment Automator is a sophisticated Chrome extension that leverages web automation technologies to assist students in efficiently navigating and completing their coursework on the Amigo LMS platform. The system intelligently identifies different types of content (quizzes, assignments, lessons) and applies appropriate automation strategies while respecting platform limitations and academic integrity guidelines. The extension provides a user-friendly interface for configuration, real-time progress monitoring, and comprehensive logging capabilities.
+
+================================================================================
+
+2. General Description
+================================================================================
+
+2.1 Product Perspective
+The Amigo LMS Assignment Automator operates as a Chrome browser extension that integrates seamlessly with the existing Amigo LMS web interface. It functions as an overlay automation system that interacts with web elements through DOM manipulation and browser APIs, without modifying the underlying LMS platform.
+
+2.2 User Characteristics
+- Primary Users: Students enrolled in courses on Amigo LMS platform
+- Technical Proficiency: Basic to intermediate computer literacy
+- Usage Pattern: Regular daily usage during academic semesters
+- Device Requirements: Chrome browser on Windows, macOS, or Linux systems
+- Network Requirements: Stable internet connection for LMS access
+
+2.3 General Functions
+- Automated Course Navigation: Systematically traverses course content in logical order
+- Intelligent Quiz Completion: Automatically answers quiz questions using predefined strategies
+- Assignment Management: Handles various assignment types including file uploads and text submissions
+- Progress Tracking: Maintains detailed logs of completed activities and visited content
+- User Configuration: Provides customizable settings for automation behavior
+- Error Handling: Robust error detection and recovery mechanisms
+
+2.4 Benefits
+- Time Efficiency: Reduces manual coursework completion time by 70-80%
+- Consistency: Ensures uniform completion of all course requirements
+- Progress Visibility: Real-time tracking of academic progress
+- Flexibility: Customizable automation settings for different course types
+- Reliability: Robust error handling and recovery mechanisms
+
+================================================================================
+
+3. Functional Requirements
+================================================================================
+
+3.1 Core Automation Functions
+
+FR-001: Course Content Navigation
+- Description: Automatically navigate through course content in systematic order
+- Input: Course page URL, navigation preferences
+- Output: Sequential navigation through all accessible course content
+- Priority: High
+- Validation: Verify all accessible content is visited exactly once
+
+FR-002: Quiz Detection and Completion
+- Description: Identify quiz pages and automatically complete quiz questions
+- Input: Quiz page URL, question types (multiple choice, true/false, etc.)
+- Output: Completed quiz with submitted answers
+- Priority: High
+- Validation: Ensure all questions are answered and quiz is properly submitted
+
+FR-003: Assignment Submission
+- Description: Handle various assignment types including text submissions and file uploads
+- Input: Assignment page URL, submission content, file attachments
+- Output: Successfully submitted assignment
+- Priority: High
+- Validation: Verify assignment submission confirmation
+
+FR-004: Progress Tracking
+- Description: Maintain comprehensive logs of completed activities and visited content
+- Input: Activity completion events, page navigation data
+- Output: Persistent progress logs and completion statistics
+- Priority: Medium
+- Validation: Ensure accurate tracking of all completed activities
+
+3.2 User Interface Functions
+
+FR-005: Extension Popup Interface
+- Description: Provide user-friendly interface for extension configuration and control
+- Input: User preferences, automation settings
+- Output: Configured automation parameters and real-time status display
+- Priority: High
+- Validation: Ensure all settings are properly saved and applied
+
+FR-006: Settings Management
+- Description: Allow users to configure automation behavior and preferences
+- Input: User configuration data
+- Output: Persistent settings storage and retrieval
+- Priority: Medium
+- Validation: Verify settings persistence across browser sessions
+
+FR-007: Logging and Monitoring
+- Description: Provide detailed logs of automation activities and system status
+- Input: Automation events, error conditions, user actions
+- Output: Comprehensive log files and real-time status updates
+- Priority: Medium
+- Validation: Ensure complete and accurate logging of all activities
+
+3.3 Error Handling Functions
+
+FR-008: Error Detection and Recovery
+- Description: Identify and handle various error conditions during automation
+- Input: Error conditions, system state data
+- Output: Error recovery actions and user notifications
+- Priority: High
+- Validation: Ensure graceful handling of all identified error conditions
+
+FR-009: Retry Mechanisms
+- Description: Implement intelligent retry logic for failed operations
+- Input: Failed operation data, retry parameters
+- Output: Successful operation completion or appropriate error handling
+- Priority: Medium
+- Validation: Verify retry logic effectiveness and prevent infinite loops
+
+================================================================================
+
+4. Interface Requirements
+================================================================================
+
+4.1 User Interfaces
+- Chrome Extension Popup: HTML-based interface with CSS styling for configuration and control
+- Browser Console Integration: Real-time logging and debugging information
+- Notification System: Browser notifications for important events and errors
+
+4.2 Hardware Interfaces
+- Chrome Browser API: Integration with Chrome extension APIs for tab management and storage
+- Web Page DOM: Interaction with HTML elements through JavaScript DOM manipulation
+- Local Storage: Chrome storage API for persistent data management
+
+4.3 Software Interfaces
+- Amigo LMS Platform: HTTP-based interaction with LMS web interface
+- Chrome Extension Runtime: Communication between popup, content script, and background script
+- Chrome Storage API: Persistent storage for settings and progress data
+
+4.4 Communication Interfaces
+- Message Passing: Chrome runtime messaging for inter-script communication
+- Event Listeners: DOM event handling for user interactions and page changes
+- Storage Events: Chrome storage change notifications for data synchronization
+
+================================================================================
+
+5. Performance Requirements
+================================================================================
+
+5.1 Response Time Requirements
+- Page Load Detection: Maximum 2 seconds to detect page type and initiate appropriate automation
+- Button Click Response: Maximum 1 second delay between button detection and click execution
+- Settings Update: Maximum 500ms for settings changes to take effect
+- Log Generation: Real-time logging with maximum 100ms delay
+
+5.2 Throughput Requirements
+- Quiz Completion: Minimum 1 quiz per minute for standard multiple-choice quizzes
+- Content Navigation: Minimum 5 pages per minute for standard course content
+- Log Processing: Handle up to 1000 log entries per session without performance degradation
+
+5.3 Resource Utilization
+- Memory Usage: Maximum 50MB RAM usage during normal operation
+- CPU Usage: Maximum 10% CPU utilization during active automation
+- Storage Usage: Maximum 10MB for persistent data storage
+
+5.4 Reliability Requirements
+- Uptime: 99.5% availability during active use
+- Error Rate: Maximum 1% failure rate for automated operations
+- Recovery Time: Maximum 30 seconds to recover from error conditions
+
+================================================================================
+
+6. Design Constraints
+================================================================================
+
+6.1 Platform Constraints
+- Browser Compatibility: Must work exclusively with Chrome browser (version 88+)
+- Extension Manifest: Must comply with Chrome Extension Manifest V3 requirements
+- Content Security Policy: Must adhere to CSP restrictions for content scripts
+
+6.2 Technical Constraints
+- JavaScript Only: Implementation must use only JavaScript, HTML, and CSS
+- No External Dependencies: Cannot rely on external libraries or frameworks
+- Chrome APIs Only: Limited to Chrome extension APIs and standard web APIs
+
+6.3 Security Constraints
+- No Data Collection: Cannot collect or transmit personal user data
+- Local Processing Only: All processing must occur locally within the browser
+- Secure Storage: All data must be stored securely using Chrome storage APIs
+
+6.4 Academic Integrity Constraints
+- No Cheating: Must not provide answers or solutions to academic content
+- Transparent Operation: All automation activities must be logged and visible to user
+- User Control: User must have full control over automation behavior and can stop at any time
+
+================================================================================
+
+7. Non-Functional Attributes
+================================================================================
+
+7.1 Security
+- Data Protection: All user data stored locally with encryption
+- Access Control: No unauthorized access to user's academic accounts
+- Privacy: No collection or transmission of personal information
+
+7.2 Reliability
+- Fault Tolerance: Graceful handling of network interruptions and page load failures
+- Error Recovery: Automatic recovery from common error conditions
+- Data Integrity: Consistent state management and data persistence
+
+7.3 Usability
+- User-Friendly Interface: Intuitive popup interface with clear controls
+- Comprehensive Logging: Detailed logs for troubleshooting and progress tracking
+- Flexible Configuration: Customizable settings for different use cases
+
+7.4 Maintainability
+- Modular Design: Well-structured code with clear separation of concerns
+- Comprehensive Documentation: Detailed code comments and user documentation
+- Error Handling: Robust error handling with detailed logging
+
+7.5 Portability
+- Chrome Extension: Designed specifically for Chrome browser ecosystem
+- Cross-Platform: Works on Windows, macOS, and Linux operating systems
+- Version Compatibility: Compatible with Chrome versions 88 and above
+
+================================================================================
+
+8. Preliminary Schedule and Budget
+================================================================================
+
+8.1 Development Timeline
+- Phase 1 (Weeks 1-2): Core automation engine and basic functionality
+- Phase 2 (Weeks 3-4): User interface and settings management
+- Phase 3 (Weeks 5-6): Error handling, logging, and optimization
+- Phase 4 (Weeks 7-8): Testing, debugging, and final polish
+
+8.2 Resource Requirements
+- Development Time: 40-60 hours total
+- Testing Time: 15-20 hours
+- Documentation: 8-10 hours
+- Total Project Duration: 8-10 weeks
+
+8.3 Budget Estimation
+- Development Cost: $2,000 - $3,000 (based on 40-60 hours at $50/hour)
+- Testing Cost: $500 - $750 (15-20 hours at $25/hour)
+- Documentation Cost: $200 - $250 (8-10 hours at $25/hour)
+- Total Project Cost: $2,700 - $4,000
+
+================================================================================
+
+9. Appendices
+================================================================================
+
+9.1 References
+- Chrome Extension Development Documentation
+- Amigo LMS Platform API Documentation
+- Web Automation Best Practices
+- Academic Integrity Guidelines
+
+9.2 Definitions and Acronyms
+- LMS: Learning Management System
+- DOM: Document Object Model
+- API: Application Programming Interface
+- CSP: Content Security Policy
+- SRS: Software Requirements Specification
+
+9.3 Technical Specifications
+- Programming Language: JavaScript (ES6+)
+- Markup Language: HTML5
+- Styling: CSS3
+- Browser: Chrome 88+
+- Extension Manifest: Version 3
+
+================================================================================
+
+10. Uses of SRS Document
+================================================================================
+
+10.1 Development Team
+The development team will use this SRS to understand the complete scope of functionality required, technical constraints, and performance expectations. It serves as the primary reference for implementation decisions and architectural choices.
+
+10.2 Testing Team
+Test plans will be generated based on the functional requirements outlined in this document, ensuring comprehensive coverage of all specified behaviors and edge cases.
+
+10.3 Maintenance and Support
+Support staff will reference this document to understand the expected behavior of the system and troubleshoot user issues effectively.
+
+10.4 Project Management
+Project managers will use this document for resource allocation, timeline planning, and progress tracking against defined requirements.
+
+10.5 Customer Expectations
+End users can reference this document to understand the capabilities and limitations of the system, setting appropriate expectations for functionality and performance.
+
+================================================================================
+
+11. Conclusion
+================================================================================
+
+The development of the Amigo LMS Assignment Automator Chrome Extension requires a well-structured Software Requirements Specification to ensure successful delivery of a high-quality product. This SRS document provides comprehensive guidance for all stakeholders, from development teams to end users, ensuring clear communication of requirements, constraints, and expectations.
+
+The document establishes a solid foundation for creating an efficient, reliable, and user-friendly automation solution that respects academic integrity while significantly improving the user experience for students using the Amigo LMS platform. By following the specifications outlined in this SRS, the development team can deliver a product that meets all functional and non-functional requirements while staying within budget and timeline constraints.
+
+The success of this project depends on adherence to the requirements specified in this document, regular communication between stakeholders, and iterative testing and refinement throughout the development process.
+
+================================================================================
+End of Document
+================================================================================
