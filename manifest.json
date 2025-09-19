@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Amigo Assignment Automator",
+  "version": "1.0",
+  "description": "Automatically handles Amigo LMS assignments and content navigation",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://amigolms.amityonline.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://amigolms.amityonline.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Amigo Automator"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
