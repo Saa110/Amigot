@@ -4,6 +4,7 @@ console.log('Amigo Assignment Automator loaded');
 class AmigoAutomator {
   constructor() {
     this.isEnabled = false;
+    this.timeouts = [];
     this.settings = {
       autoSubmit: true,
       randomAnswers: true,
@@ -13,9 +14,19 @@ class AmigoAutomator {
     this.init();
   }
 
-  init() {
+  async init() {
     // Load settings from storage
-    this.loadSettings();
+    await this.loadSettings();
+    // Honor persisted active state
+    this.isEnabled = Boolean(this.settings.isActive);
+    if (this.isEnabled) {
+      this.runAutomationIfApplicable();
+      this.continueNavigationIfQueued();
+    }
+  }
+
+  runAutomationIfApplicable() {
+    if (!this.isEnabled) return;
     
     // Check if we're on a course page
     if (this.isCoursePage()) {
@@ -39,6 +50,37 @@ class AmigoAutomator {
     }
   }
 
+  enable() {
+    if (this.isEnabled) return;
+    this.isEnabled = true;
+    this.runAutomationIfApplicable();
+  }
+
+  disable() {
+    if (!this.isEnabled) return;
+    this.isEnabled = false;
+    this.clearAllTimeouts();
+    try {
+      sessionStorage.removeItem('__amigoNavigated');
+      sessionStorage.removeItem('__amigoNavQueue');
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  setManagedTimeout(callback, delayMs) {
+    const id = setTimeout(() => {
+      callback();
+    }, delayMs);
+    this.timeouts.push(id);
+    return id;
+  }
+
+  clearAllTimeouts() {
+    this.timeouts.forEach(id => clearTimeout(id));
+    this.timeouts = [];
+  }
+
   isCoursePage() {
     return window.location.href.includes('/course/view.php') || 
            window.location.href.includes('/mod/');
@@ -51,15 +93,17 @@ class AmigoAutomator {
   }
 
   setupCourseAutomation() {
+    if (!this.isEnabled) return;
     console.log('Setting up course automation');
     
     // Wait for page to load completely
-    setTimeout(() => {
+    this.setManagedTimeout(() => {
       this.navigateCourseContent();
     }, 2000);
   }
 
   setupAssignmentAutomation() {
+    if (!this.isEnabled) return;
     console.log('Setting up assignment automation');
     
     // Check if this is an end-of-module assignment
@@ -69,7 +113,7 @@ class AmigoAutomator {
     }
 
     // Wait for assignment to load
-    setTimeout(() => {
+    this.setManagedTimeout(() => {
       this.handleAssignment();
     }, 3000);
   }
@@ -91,9 +135,28 @@ class AmigoAutomator {
   }
 
   navigateCourseContent() {
+    if (!this.isEnabled) return;
     if (!this.settings.navigateContent) return;
+    if (window.__amigoNavigated) {
+      console.log('Navigation already initiated on this page, skipping.');
+      return;
+    }
+    try {
+      if (sessionStorage.getItem('__amigoNavigated') === '1') {
+        console.log('Navigation already initiated in this session, skipping.');
+        return;
+      }
+    } catch (e) {
+      // ignore storage access errors
+    }
 
     console.log('Navigating course content');
+    window.__amigoNavigated = true;
+    try {
+      sessionStorage.setItem('__amigoNavigated', '1');
+    } catch (e) {
+      // ignore
+    }
     
     // Find all clickable content links
     const contentLinks = document.querySelectorAll('a[href*="/mod/"]');
@@ -112,17 +175,58 @@ class AmigoAutomator {
     });
 
     console.log(`Found ${nonAssessmentLinks.length} non-assessment content links`);
+    const urls = nonAssessmentLinks.map(link => link.href);
+    if (urls.length === 0) return;
+    this.saveNavQueue(urls);
+    // Start with the first item
+    this.continueNavigationIfQueued();
+  }
 
-    // Click on each non-assessment content link
-    nonAssessmentLinks.forEach((link, index) => {
-      setTimeout(() => {
-        console.log(`Opening content: ${link.textContent.trim()}`);
-        link.click();
-      }, index * 2000); // Stagger clicks by 2 seconds
-    });
+  saveNavQueue(urls) {
+    try {
+      const payload = { urls, index: 0 };
+      sessionStorage.setItem('__amigoNavQueue', JSON.stringify(payload));
+    } catch (e) {
+      console.log('Failed to save navigation queue');
+    }
+  }
+
+  loadNavQueue() {
+    try {
+      const raw = sessionStorage.getItem('__amigoNavQueue');
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  updateNavQueue(queue) {
+    try {
+      sessionStorage.setItem('__amigoNavQueue', JSON.stringify(queue));
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  continueNavigationIfQueued() {
+    if (!this.isEnabled) return;
+    const queue = this.loadNavQueue();
+    if (!queue || !Array.isArray(queue.urls)) return;
+    if (queue.index >= queue.urls.length) return;
+    const nextUrl = queue.urls[queue.index];
+    // Increment the index before navigating to avoid duplicate navs on reload
+    queue.index += 1;
+    this.updateNavQueue(queue);
+    this.setManagedTimeout(() => {
+      if (!this.isEnabled) return;
+      console.log(`Opening content: ${document.title || 'Next item'}`);
+      window.location.href = nextUrl;
+    }, 1000);
   }
 
   handleAssignment() {
+    if (!this.isEnabled) return;
     if (!this.settings.autoSubmit) return;
 
     console.log('Handling assignment');
@@ -150,24 +254,28 @@ class AmigoAutomator {
   }
 
   handleQuiz() {
+    if (!this.isEnabled) return;
     console.log('Handling quiz');
     
     // Find all question forms
     const questionForms = document.querySelectorAll('form[id*="q"]');
     
     questionForms.forEach((form, formIndex) => {
-      setTimeout(() => {
+      this.setManagedTimeout(() => {
+        if (!this.isEnabled) return;
         this.fillQuizForm(form);
       }, formIndex * 1000);
     });
 
     // Auto-submit after filling all forms
-    setTimeout(() => {
+    this.setManagedTimeout(() => {
+      if (!this.isEnabled) return;
       this.submitQuiz();
     }, questionForms.length * 1000 + 2000);
   }
 
   fillQuizForm(form) {
+    if (!this.isEnabled) return;
     console.log('Filling quiz form');
     
     // Handle multiple choice questions
@@ -222,6 +330,7 @@ class AmigoAutomator {
   }
 
   submitQuiz() {
+    if (!this.isEnabled) return;
     console.log('Submitting quiz');
     
     // Look for submit button
@@ -242,6 +351,7 @@ class AmigoAutomator {
   }
 
   handleAssignmentSubmission() {
+    if (!this.isEnabled) return;
     console.log('Handling assignment submission');
     
     // Fill text areas with random content
@@ -256,12 +366,14 @@ class AmigoAutomator {
     console.log(`Found ${fileInputs.length} file upload inputs (skipping)`);
 
     // Submit assignment
-    setTimeout(() => {
+    this.setManagedTimeout(() => {
+      if (!this.isEnabled) return;
       this.submitAssignment();
     }, 2000);
   }
 
   submitAssignment() {
+    if (!this.isEnabled) return;
     console.log('Submitting assignment');
     
     const submitButton = document.querySelector('input[type="submit"], button[type="submit"]');
@@ -271,12 +383,14 @@ class AmigoAutomator {
   }
 
   handleLesson() {
+    if (!this.isEnabled) return;
     console.log('Handling lesson');
     
     // Navigate through lesson pages
     const nextButton = document.querySelector('input[value*="Next"], button:contains("Next")');
     if (nextButton) {
-      setTimeout(() => {
+      this.setManagedTimeout(() => {
+        if (!this.isEnabled) return;
         nextButton.click();
       }, 3000);
     }
@@ -286,16 +400,21 @@ class AmigoAutomator {
 // Initialize the automator when the page loads
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    new AmigoAutomator();
+    window.amigoAutomator = new AmigoAutomator();
   });
 } else {
-  new AmigoAutomator();
+  window.amigoAutomator = new AmigoAutomator();
 }
 
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'toggleAutomation') {
-    // Toggle automation on/off
-    sendResponse({ success: true });
+  if (request.action === 'toggleAutomation' && window.amigoAutomator) {
+    const shouldEnable = Boolean(request.enabled);
+    if (shouldEnable) {
+      window.amigoAutomator.enable();
+    } else {
+      window.amigoAutomator.disable();
+    }
+    sendResponse({ success: true, enabled: window.amigoAutomator.isEnabled });
   }
 });
