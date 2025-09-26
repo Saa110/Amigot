@@ -2,13 +2,15 @@
 
 A browser extension that automatically handles assignments and navigates content on the Amigo LMS platform.
 
+- **Suggested workflow**: First complete your Module Assessments manually. After that, enable the bot so its skip logic helps prevent accidentally attempting assessments.
+
 ## Features
 
-- **Random Answer Selection**: Automatically fills in random answers for quizzes and assignments
-- **Content Navigation**: Automatically opens and navigates through non-assessment content
-- **Smart Assignment Detection**: Skips end-of-module assignments to avoid completing important assessments
-- **Configurable Settings**: Toggle different automation features on/off
-- **Multiple Question Types**: Supports multiple choice, checkboxes, text inputs, and dropdowns
+- **Automated Content Navigation**: Clicks through non-assessment course content, skipping completed items
+- **Quiz Automation**: Attempts quizzes by selecting answers and submitting with a streamlined `QuizHandler`
+- **Smart Skipping**: Avoids end-of-module assessments and already completed activities
+- **Configurable Settings**: Popup toggles control behavior; state persists across pages
+- **Multiple Question Types**: Radios, checkboxes, text inputs, and dropdowns (best with radios via `QuizHandler`)
 
 ## Installation
 
@@ -23,29 +25,40 @@ A browser extension that automatically handles assignments and navigates content
 1. Navigate to your Amigo LMS course page
 2. Click the extension icon in your browser toolbar
 3. Configure your settings:
-   - **Auto Submit**: Automatically submit assignments
-   - **Random Answers**: Fill in random answers for questions
-   - **Skip End Module**: Skip assignments at the end of modules
-   - **Navigate Content**: Automatically open non-assessment content
-4. Click "Start Automation" to begin
+   - **Auto Submit**: Auto-advance and submit on supported activities
+   - **Random Answers**: Select random options/fill random text where applicable
+   - **Skip End Module**: Avoid end-of-module assessments
+   - **Navigate Content**: Open non-assessment content automatically
+   - **Run Quizzes**: Navigate and attempt quizzes after content
+4. Click "Start Automation" to begin. The active state is saved and honored on subsequent pages.
 
 ## How It Works
 
 ### Assignment Handling
 - Detects quiz, assignment, and lesson pages
-- Fills in random answers for all question types
-- Automatically submits completed assignments
-- Skips end-of-module assignments based on URL patterns and breadcrumbs
+- Uses a dedicated `QuizHandler` to run a strict flow: enter → fill radios → finish attempt → submit all and finish
+- Falls back to legacy handlers for checkboxes, text inputs, and selects if the streamlined path is unavailable
+- Skips end-of-module assignments based on breadcrumb keywords and URL patterns
 
 ### Content Navigation
-- Identifies non-assessment content links
-- Automatically clicks through course materials
-- Staggers navigation to avoid overwhelming the server
+- Identifies non-assessment content links inside `.activity-item`
+- Skips items already marked as completed (see Completion Detection below)
+- Opens each content item in sequence using an in-page queue
+- After finishing content, automatically proceeds to quizzes if enabled
 
 ### Safety Features
 - Skips file upload assignments
 - Avoids end-of-module assessments
 - Provides configurable settings for different use cases
+
+### Completion Detection
+- For general activities, looks for completion cues like green `btn-success`, visible "Done" text, or a check icon in the completion region
+- For quizzes, requires both sub-requirements to be marked done: "View" and "Receive a grade"
+
+### Queues and Persistence
+- Content and quiz URLs are stored in `sessionStorage` to navigate sequentially and avoid duplicates
+- Keys used: `__amigoNavQueue`, `__amigoQuizQueue`, `__amigoQuizLinks`, `__amigoQuizScanned`, `__amigoNavigated`
+- The popup’s active state and toggles are saved in `chrome.storage.sync` under `amigoSettings`
 
 ## Supported Question Types
 
@@ -61,11 +74,13 @@ A browser extension that automatically handles assignments and navigates content
 
 ⚠️ **End-of-Module Assignments**: The extension attempts to skip assignments at the end of modules, but this detection may not be 100% accurate. Always review your course structure before using the extension.
 
+
 ## File Structure
 
 ```
 ├── manifest.json          # Extension configuration
-├── content.js            # Main automation logic
+├── content.js            # Main automation logic (navigation, legacy handlers)
+├── quizHandler.js        # Streamlined quiz automation flow
 ├── popup.html            # Extension popup interface
 ├── popup.js              # Popup functionality
 ├── background.js         # Background service worker
@@ -84,8 +99,10 @@ To modify the extension:
 ## Troubleshooting
 
 - **Extension not working**: Make sure you're on an Amigo LMS page and the extension is enabled
-- **Assignments not being skipped**: Check the URL patterns and breadcrumb detection logic
-- **Content not opening**: Verify that the content links are being detected correctly
+- **Assignments not being skipped**: Breadcrumb/URL heuristics may need adjustment on your course
+- **Content not opening**: Ensure items are inside `.activity-item` and not already completed
+- **Quizzes not progressing**: If only "Re-attempt" is available, the quiz is considered done and will be skipped
+- **Host permission**: Confirm the site matches `https://amigolms.amityonline.com/*` as set in `manifest.json`
 
 ## Disclaimer
 
