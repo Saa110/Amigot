@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
     autoSubmit: document.getElementById('autoSubmit'),
     randomAnswers: document.getElementById('randomAnswers'),
     skipEndModule: document.getElementById('skipEndModule'),
-    navigateContent: document.getElementById('navigateContent')
+    navigateContent: document.getElementById('navigateContent'),
+    navigateQuizzes: document.getElementById('navigateQuizzes')
   };
 
   let isActive = false;
@@ -79,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
       randomAnswers: toggles.randomAnswers.classList.contains('active'),
       skipEndModule: toggles.skipEndModule.classList.contains('active'),
       navigateContent: toggles.navigateContent.classList.contains('active'),
+      navigateQuizzes: toggles.navigateQuizzes.classList.contains('active'),
       isActive: isActive
     };
 
