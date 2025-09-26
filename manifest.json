@@ -3,6 +3,12 @@
   "name": "Amigo Assignment Automator",
   "version": "1.0",
   "description": "Automatically handles Amigo LMS assignments and content navigation",
+  "icons": {
+    "16": "Gemini_Generated_Image_ey9pkey9pkey9pke.png",
+    "32": "Gemini_Generated_Image_ey9pkey9pkey9pke.png",
+    "48": "Gemini_Generated_Image_ey9pkey9pkey9pke.png",
+    "128": "Gemini_Generated_Image_ey9pkey9pkey9pke.png"
+  },
   "permissions": [
     "activeTab",
     "scripting",
@@ -20,7 +26,12 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Amigo Automator"
+    "default_title": "Amigo Automator",
+    "default_icon": {
+      "16": "Gemini_Generated_Image_ey9pkey9pkey9pke.png",
+      "32": "Gemini_Generated_Image_ey9pkey9pkey9pke.png",
+      "48": "Gemini_Generated_Image_ey9pkey9pkey9pke.png"
+    }
   },
   "background": {
     "service_worker": "background.js"
