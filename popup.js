@@ -3,6 +3,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const statusElement = document.getElementById('status');
   const statusText = document.getElementById('statusText');
   const toggleBtn = document.getElementById('toggleBtn');
+  const runEndModuleBtn = document.getElementById('runEndModuleBtn');
+  const startEndModuleBtn = document.getElementById('startEndModuleBtn');
+  const stopEndModuleBtn = document.getElementById('stopEndModuleBtn');
   
   const toggles = {
     autoSubmit: document.getElementById('autoSubmit'),
@@ -36,6 +39,31 @@ document.addEventListener('DOMContentLoaded', function() {
       chrome.tabs.sendMessage(tabs[0].id, {
         action: 'toggleAutomation',
         enabled: isActive
+      });
+    });
+  });
+
+  // Run End Module Assignment Handler exclusively
+  runEndModuleBtn.addEventListener('click', function() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        action: 'amigo:run-end-module-handler'
+      });
+    });
+  });
+
+  startEndModuleBtn.addEventListener('click', function() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        action: 'amigo:start-end-module-monitor'
+      });
+    });
+  });
+
+  stopEndModuleBtn.addEventListener('click', function() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        action: 'amigo:stop-end-module-monitor'
       });
     });
   });

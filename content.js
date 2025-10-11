@@ -35,6 +35,12 @@ class AmigoAutomator {
       return;
     }
     
+    // Check if we're on a resource page
+    if (this.isResourcePage()) {
+      this.setupResourceAutomation();
+      return;
+    }
+    
     // Check if we're on a course page
     if (this.isCoursePage()) {
       this.setupCourseAutomation();
@@ -62,6 +68,20 @@ class AmigoAutomator {
   enable() {
     if (this.isEnabled) return;
     this.isEnabled = true;
+    // Force fresh collections each time automation starts
+    try {
+      console.log('[Amigo] enable() - Clearing session storage (including quiz queue)');
+      sessionStorage.removeItem('__amigoQuizScanned');
+      sessionStorage.removeItem('__amigoQuizLinks');
+      sessionStorage.removeItem('__amigoNavQueue');
+      sessionStorage.removeItem('__amigoQuizQueue');
+      sessionStorage.removeItem('__amigoNavigated');
+    } catch (e) {}
+    try { window.__amigoQuizScanned = false; } catch (e) {}
+    try { window.__amigoNavigated = false; } catch (e) {}
+
+    // Re-collect immediately to reflect the current page state
+    try { this.collectQuizLinks(); } catch (e) {}
     this.runAutomationIfApplicable();
   }
 
@@ -70,6 +90,7 @@ class AmigoAutomator {
     this.isEnabled = false;
     this.clearAllTimeouts();
     try {
+      console.log('[Amigo] disable() - Clearing session storage (including quiz queue)');
       sessionStorage.removeItem('__amigoNavigated');
       sessionStorage.removeItem('__amigoNavQueue');
       sessionStorage.removeItem('__amigoQuizQueue');
@@ -91,9 +112,15 @@ class AmigoAutomator {
     this.timeouts = [];
   }
 
+  
+
   isCoursePage() {
     return window.location.href.includes('/course/view.php') || 
-           window.location.href.includes('/mod/');
+           (window.location.href.includes('/mod/') && !this.isResourcePage());
+  }
+
+  isResourcePage() {
+    return window.location.href.includes('/mod/resource/');
   }
 
   isAssignmentPage() {
@@ -120,6 +147,18 @@ class AmigoAutomator {
         console.log('Setting up quizzes navigation');
         this.startQuizNavigationIfAvailable();
       }
+    }, 2000);
+  }
+
+  setupResourceAutomation() {
+    if (!this.isEnabled) return;
+    console.log('Setting up resource automation');
+    
+    // Resource pages just need to be viewed, then continue navigation
+    // Wait a moment for the page to load, then continue to next item
+    this.setManagedTimeout(() => {
+      console.log('Resource page loaded, continuing navigation...');
+      this.continueNavigationIfQueued();
     }, 2000);
   }
 
@@ -201,9 +240,11 @@ class AmigoAutomator {
 
     let viewDone = false;
     let gradeDone = false;
+    let viewRowExists = false;
     listItems.forEach(li => {
       const rowText = normalize(li.textContent);
       if (!viewDone && rowText.includes('view')) {
+        viewRowExists = true;
         viewDone = isRowDone(li);
       }
       if (!gradeDone && (rowText.includes('receive a grade') || rowText.includes('recieve a grade') || rowText.includes('received a grade'))) {
@@ -211,7 +252,8 @@ class AmigoAutomator {
       }
     });
 
-    return viewDone && gradeDone;
+    // Make "View" optional: if a View row exists, require it; otherwise, grade alone is sufficient
+    return gradeDone && (!viewRowExists || viewDone);
   }
 
   navigateCourseContent() {
@@ -297,18 +339,50 @@ class AmigoAutomator {
       console.log('Finished content navigation.');
       // Re-collect quiz links with latest completion state before starting
       try { this.collectQuizLinks(); } catch (_) {}
-      // Clear any stale quiz queue from previous runs
-      try { sessionStorage.removeItem('__amigoQuizQueue'); } catch (_) {}
       
       if (!this.isAssignmentPage()) {
+        // Clear any stale quiz queue from previous runs only when actually starting quiz navigation
+        try { 
+          console.log('[Amigo] pollNavQueueCompletion() - Clearing stale quiz queue before starting quiz navigation');
+          sessionStorage.removeItem('__amigoQuizQueue'); 
+        } catch (_) {}
         console.log('Starting quiz navigation...');
         this.startQuizNavigationIfAvailable();
       } else {
         console.log('Currently on an assignment page; deferring quiz navigation to assignment completion.');
+        console.log('[Amigo] pollNavQueueCompletion() - NOT clearing quiz queue since we\'re deferring navigation');
       }
       return;
     }
     this.setManagedTimeout(() => this.pollNavQueueCompletion(), 1000);
+  }
+
+  // When quiz queue is completed, notify and stop
+  pollQuizQueueCompletion() {
+    if (!this.isEnabled) return;
+    const queue = this.loadQuizQueue();
+    if (!queue || !Array.isArray(queue.urls)) return;
+    if (queue.index >= queue.urls.length) {
+      console.log('Finished quiz navigation. All links processed.');
+      this.notifyCompletionAndStop();
+      return;
+    }
+    this.setManagedTimeout(() => this.pollQuizQueueCompletion(), 1000);
+  }
+
+  notifyCompletionAndStop() {
+    console.log('All automation completed. Notifying and stopping...');
+    try {
+      chrome.runtime.sendMessage({ action: 'amigo:all-done' });
+    } catch (e) {
+      console.log('Failed to send completion message:', e);
+    }
+    // Stop the automator
+    try { 
+      this.disable(); 
+    } catch (e) {
+      console.log('Failed to disable automator:', e);
+    }
   }
 
   saveNavQueue(urls) {
@@ -342,7 +416,26 @@ class AmigoAutomator {
     if (!this.isEnabled) return;
     const queue = this.loadNavQueue();
     if (!queue || !Array.isArray(queue.urls)) return;
-    if (queue.index >= queue.urls.length) return;
+    if (queue.index >= queue.urls.length) {
+      // Content queue is finished, start quiz navigation
+      console.log('Content queue finished, starting quiz navigation...');
+      // Re-collect quiz links with latest completion state before starting
+      try { this.collectQuizLinks(); } catch (_) {}
+      
+      if (!this.isAssignmentPage()) {
+        // Clear any stale quiz queue from previous runs only when actually starting quiz navigation
+        try { 
+          console.log('[Amigo] continueNavigationIfQueued() - Clearing stale quiz queue before starting quiz navigation');
+          sessionStorage.removeItem('__amigoQuizQueue'); 
+        } catch (_) {}
+        console.log('Starting quiz navigation...');
+        this.startQuizNavigationIfAvailable();
+      } else {
+        console.log('Currently on an assignment page; deferring quiz navigation to assignment completion.');
+        console.log('[Amigo] continueNavigationIfQueued() - NOT clearing quiz queue since we\'re deferring navigation');
+      }
+      return;
+    }
     const nextUrl = queue.urls[queue.index];
     // Increment the index before navigating to avoid duplicate navs on reload
     queue.index += 1;
@@ -388,16 +481,29 @@ class AmigoAutomator {
     try {
       matches = JSON.parse(sessionStorage.getItem('__amigoQuizLinks') || '[]');
     } catch (e) {}
+    
+    // Debug: Print what we found
+    console.log('[Amigo] startQuizNavigationIfAvailable - Raw matches:', matches);
+    console.log('[Amigo] startQuizNavigationIfAvailable - Matches length:', matches.length);
+    
     const urls = (matches || []).map(m => m.href).filter(Boolean);
+    console.log('[Amigo] startQuizNavigationIfAvailable - Extracted URLs:', urls);
+    console.log('[Amigo] startQuizNavigationIfAvailable - URLs length:', urls.length);
+    
     if (!urls.length) {
       console.log('No quiz links found to navigate.');
+      // No quiz links, so we're completely done - show notification and stop
+      this.notifyCompletionAndStop();
       return;
     }
     this.saveQuizQueue(urls);
     this.continueQuizNavigationIfQueued();
+    // Start polling for quiz completion now that we have quiz links
+    this.setManagedTimeout(() => this.pollQuizQueueCompletion(), 500);
   }
 
-  continueQuizNavigationIfQueued() {
+  
+continueQuizNavigationIfQueued() {
     if (!this.isEnabled) return;
     const queue = this.loadQuizQueue();
     if (!queue || !Array.isArray(queue.urls)) return;
@@ -413,7 +519,6 @@ class AmigoAutomator {
       window.location.href = nextUrl;
     }, 1000);
   }
-
   handleAssignment() {
     if (!this.isEnabled) return;
     if (!this.settings.autoSubmit) return;
@@ -429,6 +534,13 @@ class AmigoAutomator {
           const handler = new window.QuizHandler({
             loggerPrefix: '[Amigo:QuizHandler]',
             onAdvance: () => {
+              // Debug: Print quiz queue before advancing
+              const queue = this.loadQuizQueue();
+              console.log('[Amigo:QuizHandler] Quiz queue state:', queue);
+              console.log('[Amigo:QuizHandler] Quiz queue URLs:', queue ? queue.urls : 'No queue');
+              console.log('[Amigo:QuizHandler] Current index:', queue ? queue.index : 'No queue');
+              console.log('[Amigo:QuizHandler] Remaining quizzes:', queue ? queue.urls.length - queue.index : 'No queue');
+              
               this.setManagedTimeout(() => this.continueQuizNavigationIfQueued(), 500);
             },
             isEnabled: this.isEnabled,
@@ -462,7 +574,7 @@ class AmigoAutomator {
     return window.location.href.includes('/mod/lesson/');
   }
 
-  handleQuiz() {
+  /*handleQuiz() {
     if (!this.isEnabled) return;
     console.log('Handling quiz');
     console.log('[Amigo] handleQuiz() invoked at', new Date().toISOString(), 'URL:', window.location.href);
@@ -521,7 +633,7 @@ class AmigoAutomator {
       if (!this.isEnabled) return;
       this.submitQuiz();
     }, questionForms.length * 1000 + 2000);
-  }
+  }*/
 
   fillQuizForm(form) {
     if (!this.isEnabled) return;
@@ -759,4 +871,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     })();
     return true; // keep the message channel open for async response
   }
+  if (request.action === 'amigo:run-end-module-handler' && window.amigoAutomator) {
+    // Delegated to standalone handler listener; no-op here
+    sendResponse({ success: true, delegated: true });
+    return true;
+  }
+  // start/stop monitor handled by handler; ignore here
 });

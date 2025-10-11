@@ -20,6 +20,39 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'toggleAutomation') {
     // Handle automation toggle
     sendResponse({ success: true });
+  } else if (request.action === 'amigo:all-done') {
+    try {
+      chrome.notifications.create('amigo_all_done', {
+        type: 'basic',
+        iconUrl: 'logo.png',
+        title: 'Amigo Automator',
+        message: 'Bot has processed all links, stopping now'
+      });
+    } catch (e) {
+      // ignore
+    }
+    sendResponse({ success: true });
+  } else if (request.action === 'amigo:export-answers') {
+    try {
+      const { courseName, assignmentName, payload } = request;
+      const safeCourse = (courseName || 'Unknown Course').replace(/[^a-z0-9\-_\s]/gi, '_').trim();
+      const safeAssignment = (assignmentName || 'Assignment').replace(/[^a-z0-9\-_\s]/gi, '_').trim();
+      const filename = `Database/${safeCourse}/${safeAssignment}.json`;
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      chrome.downloads.download({ url, filename, saveAs: false }, (downloadId) => {
+        if (chrome.runtime.lastError) {
+          sendResponse({ success: false, error: chrome.runtime.lastError.message });
+        } else {
+          sendResponse({ success: true, downloadId });
+        }
+        // Revoke after a short delay
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      });
+    } catch (e) {
+      sendResponse({ success: false, error: String(e) });
+    }
+    return true;
   }
 });
 

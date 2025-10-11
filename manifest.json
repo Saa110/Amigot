@@ -4,15 +4,17 @@
   "version": "1.0",
   "description": "Automatically handles Amigo LMS assignments and content navigation",
   "icons": {
-    "16": "Gemini_Generated_Image_ey9pkey9pkey9pke.png",
-    "32": "Gemini_Generated_Image_ey9pkey9pkey9pke.png",
-    "48": "Gemini_Generated_Image_ey9pkey9pkey9pke.png",
-    "128": "Gemini_Generated_Image_ey9pkey9pkey9pke.png"
+    "16": "logo.png",
+    "32": "logo.png",
+    "48": "logo.png",
+    "128": "logo.png"
   },
   "permissions": [
     "activeTab",
     "scripting",
-    "storage"
+    "storage",
+    "notifications",
+    "downloads"
   ],
   "host_permissions": [
     "https://amigolms.amityonline.com/*"
@@ -20,7 +22,7 @@
   "content_scripts": [
     {
       "matches": ["https://amigolms.amityonline.com/*"],
-      "js": ["quizHandler.js", "content.js"],
+      "js": ["EndModuleAssignmentHandler.js", "quizHandler.js", "content.js"],
       "run_at": "document_end"
     }
   ],
@@ -28,12 +30,18 @@
     "default_popup": "popup.html",
     "default_title": "Amigo Automator",
     "default_icon": {
-      "16": "Gemini_Generated_Image_ey9pkey9pkey9pke.png",
-      "32": "Gemini_Generated_Image_ey9pkey9pkey9pke.png",
-      "48": "Gemini_Generated_Image_ey9pkey9pkey9pke.png"
+      "16": "logo.png",
+      "32": "logo.png",
+      "48": "logo.png"
     }
   },
   "background": {
     "service_worker": "background.js"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["Database/*"],
+      "matches": ["https://amigolms.amityonline.com/*"]
+    }
+  ]
 }

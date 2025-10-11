@@ -195,7 +195,7 @@
               clearInterval(confirmInterval);
             }
           }, 200);
-          this.setDelay(() => this.notifyAdvance('submitted'), this.finishDelayMs);
+          //this.setDelay(() => this.notifyAdvance('submitted'), this.finishDelayMs);
         } else if (attempts >= maxAttempts) {
           clearInterval(interval);
           this.log('Submit all and finish button not found after waiting');
