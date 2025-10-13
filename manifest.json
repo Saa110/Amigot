@@ -22,7 +22,7 @@
   "content_scripts": [
     {
       "matches": ["https://amigolms.amityonline.com/*"],
-      "js": ["EndModuleAssignmentHandler.js", "quizHandler.js", "content.js"],
+      "js": [ "quizHandler.js", "content.js"],
       "run_at": "document_end"
     }
   ],
