@@ -32,19 +32,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       // ignore
     }
     sendResponse({ success: true });
-  } else if (request.action === 'facultyAutomationComplete') {
-    try {
-      const totalCount = request.totalCount || 0;
-      chrome.notifications.create('faculty_automation_complete', {
-        type: 'basic',
-        iconUrl: 'logo.png',
-        title: 'Faculty Automation Complete',
-        message: `✅ Successfully filled ${totalCount} faculty feedback forms!`
-      });
-    } catch (e) {
-      console.log('Could not create notification:', e);
-    }
-    sendResponse({ success: true });
   } else if (request.action === 'amigo:export-answers') {
     try {
       const { courseName, assignmentName, payload } = request;

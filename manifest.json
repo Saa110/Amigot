@@ -28,7 +28,7 @@
     },
     {
       "matches": ["https://s.amizone.net/*"],
-      "js": ["surveyHandler.js", "facultyAutomator.js"],
+      "js": ["surveyHandler.js"],
       "run_at": "document_end"
     }
   ],
