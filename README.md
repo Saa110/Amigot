@@ -8,6 +8,8 @@ A browser extension that automatically handles assignments and navigates content
 
 - **Automated Content Navigation**: Clicks through non-assessment course content, skipping completed items
 - **Quiz Automation**: Attempts quizzes by selecting answers and submitting with a streamlined `QuizHandler`
+- **Survey Form Filler**: Automatically fills survey forms with positive responses (Strongly Agree/Yes) and submits them
+- **🚀 Faculty Feedback Automation**: Automatically collects all faculty links, navigates to each faculty, fills and submits their feedback forms sequentially - **ONE CLICK FOR ALL FACULTY!**
 - **Smart Skipping**: Avoids end-of-module assessments and already completed activities
 - **Configurable Settings**: Popup toggles control behavior; state persists across pages
 - **Multiple Question Types**: Radios, checkboxes, text inputs, and dropdowns (best with radios via `QuizHandler`)
@@ -20,6 +22,8 @@ A browser extension that automatically handles assignments and navigates content
 4. Click "Load unpacked" and select the extension folder
 5. The extension will appear in your browser toolbar
 
+**Note**: The extension works on both `amigolms.amityonline.com` (for course content) and `s.amizone.net` (for survey forms).
+
 ## Usage
 
 1. Navigate to your Amigo LMS course page
@@ -31,6 +35,7 @@ A browser extension that automatically handles assignments and navigates content
    - **Navigate Content**: Open non-assessment content automatically
    - **Run Quizzes**: Navigate and attempt quizzes after content
 4. Click "Start Automation" to begin. The active state is saved and honored on subsequent pages.
+5. For survey forms, click the "📝 Fill Survey Form" button to automatically fill and submit with positive responses.
 
 ## How It Works
 
@@ -78,13 +83,16 @@ A browser extension that automatically handles assignments and navigates content
 ## File Structure
 
 ```
-├── manifest.json          # Extension configuration
-├── content.js            # Main automation logic (navigation, legacy handlers)
-├── quizHandler.js        # Streamlined quiz automation flow
-├── popup.html            # Extension popup interface
-├── popup.js              # Popup functionality
-├── background.js         # Background service worker
-└── README.md            # This file
+├── manifest.json                    # Extension configuration
+├── content.js                       # Main automation logic (navigation, legacy handlers)
+├── quizHandler.js                   # Streamlined quiz automation flow
+├── surveyHandler.js                 # Survey form automation with positive responses
+├── facultyAutomator.js              # Faculty feedback automation (sequential navigation)
+├── popup.html                       # Extension popup interface
+├── popup.js                         # Popup functionality
+├── background.js                    # Background service worker
+├── README.md                        # This file
+└── FACULTY_AUTOMATION_GUIDE.md     # Complete guide for faculty automation feature
 ```
 
 ## Development
