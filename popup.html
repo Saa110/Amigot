@@ -2,71 +2,186 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      width: 300px;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      margin: 0;
+      width: 320px;
+      min-height: 400px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #ffffff;
+      color: #1a1a1a;
     }
-    
+
+    /* Header */
     .header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    
-    .header h1 {
-      margin: 0;
-      font-size: 18px;
-      font-weight: bold;
-    }
-    
-    .status {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      text-align: center;
-    }
-    
-    .status.active {
-      background: rgba(76, 175, 80, 0.3);
-    }
-    
-    .controls {
+      background: #6366f1;
+      color: white;
+      padding: 16px 20px;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       gap: 10px;
+      border-bottom: 1px solid #4f46e5;
     }
-    
-    .control-group {
+
+    .header img {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+    }
+
+    .header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    /* Description */
+    .description {
+      background: #eef2ff;
+      padding: 8px 16px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .description p {
+      font-size: 11px;
+      color: #4b5563;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* Container */
+    .container {
+      padding: 16px;
+    }
+
+    /* Status and Settings Row */
+    .status-settings-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 10px;
-      border-radius: 6px;
+      margin-bottom: 16px;
     }
-    
-    .control-group label {
-      font-size: 14px;
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d1d5db;
+      transition: all 0.2s ease;
+    }
+
+    .status-dot.active {
+      background: #10b981;
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .status-text {
+      font-size: 13px;
       font-weight: 500;
+      color: #6b7280;
     }
-    
+
+    .status-text.active {
+      color: #10b981;
+    }
+
+    /* Settings Toggle Button */
+    .settings-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .settings-toggle:hover {
+      background: #f3f4f6;
+    }
+
+    .settings-toggle span {
+      font-size: 12px;
+      font-weight: 500;
+      color: #4b5563;
+    }
+
+    .settings-icon {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.3s ease;
+    }
+
+    /* Settings Content */
+    .settings-content {
+      margin-bottom: 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .settings-list {
+      background: white;
+      padding: 8px 16px;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    .setting-item label {
+      font-size: 13px;
+      color: #374151;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* Toggle Switch */
     .toggle {
       position: relative;
-      width: 50px;
+      width: 44px;
       height: 24px;
-      background: rgba(255, 255, 255, 0.3);
+      background: #d1d5db;
       border-radius: 12px;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: background 0.2s ease;
+      flex-shrink: 0;
     }
     
     .toggle.active {
-      background: #4CAF50;
+      background: #10b981;
     }
     
     .toggle::after {
@@ -78,83 +193,159 @@
       height: 20px;
       background: white;
       border-radius: 50%;
-      transition: transform 0.3s;
+      transition: transform 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     
     .toggle.active::after {
-      transform: translateX(26px);
+      transform: translateX(20px);
     }
-    
+
+    /* Buttons */
     .button {
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: white;
-      padding: 10px 20px;
+      width: 100%;
+      padding: 10px 16px;
       border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
+      border: none;
+      font-size: 13px;
       font-weight: 500;
-      transition: background 0.3s;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 8px;
     }
-    
-    .button:hover {
-      background: rgba(255, 255, 255, 0.3);
+
+    .button:active {
+      transform: scale(0.98);
     }
-    
-    .info {
-      font-size: 12px;
-      opacity: 0.8;
-      margin-top: 10px;
-      text-align: center;
+
+    .button.primary {
+      background: #6366f1;
+      color: white;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .button.primary:hover {
+      background: #4f46e5;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .button.primary.active {
+      background: #ef4444;
+    }
+
+    .button.primary.active:hover {
+      background: #dc2626;
+    }
+
+    .button.secondary {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #e5e7eb;
+    }
+
+    .button.secondary:hover {
+      background: #e5e7eb;
+      color: #1f2937;
+    }
+
+    .button.danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .button.danger:hover {
+      background: #dc2626;
+    }
+
+    .buttons-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 12px;
     }
   </style>
 </head>
 <body>
+  <!-- Header -->
   <div class="header">
-    <img src="logo.png" alt="Amigo Automator" style="width:32px;height:32px;vertical-align:middle;margin-right:8px;border-radius:6px;">
-    <h1 style="display:inline;vertical-align:middle;">Amigo Automator</h1>
+    <img src="logo.png" alt="Amigo Automator">
+    <h1>Amigo Automator</h1>
   </div>
   
-  <div class="status" id="status">
-    <div>Status: <span id="statusText">Inactive</span></div>
+  <!-- Description -->
+  <div class="description">
+    <p>Automatically handles assignments and navigates content on Amigo LMS</p>
   </div>
   
-  <div class="controls">
-    <div class="control-group">
-      <label for="autoSubmit">Auto Submit</label>
-      <div class="toggle" id="autoSubmit"></div>
+  <!-- Container -->
+  <div class="container">
+    <!-- Status and Settings Toggle Row -->
+    <div class="status-settings-row">
+      <!-- Status (Left) -->
+      <div class="status">
+        <div id="statusDot" class="status-dot"></div>
+        <span id="statusText" class="status-text">Inactive</span>
+      </div>
+      
+      <!-- Settings Toggle (Right) -->
+      <button id="settingsToggle" class="settings-toggle">
+        <span>Settings</span>
+        <svg id="settingsIcon" class="settings-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+      </button>
     </div>
     
-    <div class="control-group">
-      <label for="randomAnswers">Random Answers</label>
-      <div class="toggle active" id="randomAnswers"></div>
-    </div>
-    
-    <div class="control-group">
-      <label for="skipEndModule">Skip End Module</label>
-      <div class="toggle active" id="skipEndModule"></div>
-    </div>
-    
-    <div class="control-group">
-      <label for="navigateContent">Navigate Content</label>
-      <div class="toggle active" id="navigateContent"></div>
-    </div>
+    <!-- Settings Section (Collapsible) -->
+    <div id="settingsContent" class="settings-content" style="display: none;">
+      <div class="settings-list">
+        <div class="setting-item">
+          <label for="autoSubmit">Auto Submit</label>
+          <div class="toggle" id="autoSubmit"></div>
+        </div>
+        
+        <div class="setting-item">
+          <label for="randomAnswers">Random Answers</label>
+          <div class="toggle active" id="randomAnswers"></div>
+        </div>
+        
+        <div class="setting-item">
+          <label for="skipEndModule">Skip End Module</label>
+          <div class="toggle active" id="skipEndModule"></div>
+        </div>
+        
+        <div class="setting-item">
+          <label for="navigateContent">Navigate Content</label>
+          <div class="toggle active" id="navigateContent"></div>
+        </div>
 
-    <div class="control-group">
-      <label for="navigateQuizzes">Run Quizzes</label>
-      <div class="toggle active" id="navigateQuizzes"></div>
+        <div class="setting-item">
+          <label for="navigateQuizzes">Run Quizzes</label>
+          <div class="toggle active" id="navigateQuizzes"></div>
+        </div>
+      </div>
     </div>
-  </div>
-  
-  <button class="button" id="toggleBtn">Start Automation</button>
-  
-  <button class="button" id="runEndModuleBtn">Run End Module Assignment Handler</button>
-  
-  <button class="button" id="startEndModuleBtn">Start End Module Handler (Auto)</button>
-  <button class="button" id="stopEndModuleBtn">Stop End Module Handler</button>
-  
-  <div class="info">
-    Automatically handles assignments and navigates content on Amigo LMS
+    
+    <!-- Primary Button -->
+    <button id="toggleBtn" class="button primary">
+      Start Automation
+    </button>
+    
+    <!-- Secondary Buttons -->
+    <div class="buttons-group">
+      <button id="runEndModuleBtn" class="button secondary">
+        Run End Module Assignment Handler
+      </button>
+      
+      <button id="startEndModuleBtn" class="button secondary">
+        Start End Module Handler (Auto)
+      </button>
+      
+      <button id="stopEndModuleBtn" class="button danger">
+        Stop End Module Handler
+      </button>
+    </div>
   </div>
   
   <script src="popup.js"></script>

@@ -1,6 +1,6 @@
 // Popup script for Amigo Assignment Automator
 document.addEventListener('DOMContentLoaded', function() {
-  const statusElement = document.getElementById('status');
+  const statusDot = document.getElementById('statusDot');
   const statusText = document.getElementById('statusText');
   const toggleBtn = document.getElementById('toggleBtn');
   const runEndModuleBtn = document.getElementById('runEndModuleBtn');
@@ -16,6 +16,31 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   let isActive = false;
+  let settingsExpanded = false; // Start collapsed
+
+  // Settings collapse/expand
+  const settingsToggle = document.getElementById('settingsToggle');
+  const settingsContent = document.getElementById('settingsContent');
+  const settingsIcon = document.getElementById('settingsIcon');
+
+  settingsToggle.addEventListener('click', function() {
+    settingsExpanded = !settingsExpanded;
+    
+    if (settingsExpanded) {
+      settingsContent.style.display = 'block';
+      settingsContent.style.color = 'black';
+      settingsIcon.style.transform = 'rotate(40deg)';
+    } else {
+      settingsContent.style.display = 'none';
+      settingsContent.style.color = 'white';
+      settingsIcon.style.transform = 'rotate(0deg)';
+    }
+    
+    // Save preference
+    if (typeof chrome !== 'undefined' && chrome.storage) {
+      chrome.storage.sync.set({settingsExpanded: settingsExpanded});
+    }
+  });
 
   // Load saved settings
   loadSettings();
@@ -70,17 +95,61 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function updateUI() {
     if (isActive) {
-      statusElement.classList.add('active');
+      // Update status dot and text
+      statusDot.classList.add('active');
+      statusText.classList.add('active');
       statusText.textContent = 'Active';
+      
+      // Update button
       toggleBtn.textContent = 'Stop Automation';
+      toggleBtn.classList.add('active');
     } else {
-      statusElement.classList.remove('active');
+      // Update status dot and text
+      statusDot.classList.remove('active');
+      statusText.classList.remove('active');
       statusText.textContent = 'Inactive';
+      
+      // Update button
       toggleBtn.textContent = 'Start Automation';
+      toggleBtn.classList.remove('active');
     }
   }
 
   function loadSettings() {
+    chrome.storage.sync.get(['amigoSettings', 'settingsExpanded'], function(result) {
+      if (result.amigoSettings) {
+        const settings = result.amigoSettings;
+        
+        // Update toggles based on saved settings
+        Object.keys(toggles).forEach(key => {
+          if (settings[key] !== undefined) {
+            if (settings[key]) {
+              toggles[key].classList.add('active');
+            } else {
+              toggles[key].classList.remove('active');
+            }
+          }
+        });
+        
+        isActive = settings.isActive || false;
+        updateUI();
+      }
+      
+      // Load settings expanded state
+      if (result.settingsExpanded !== undefined) {
+        settingsExpanded = result.settingsExpanded;
+        if (settingsExpanded) {
+          settingsContent.style.display = 'block';
+          settingsIcon.style.transform = 'rotate(180deg)';
+        } else {
+          settingsContent.style.display = 'none';
+          settingsIcon.style.transform = 'rotate(0deg)';
+        }
+      }
+    });
+  }
+
+  function loadSettingsLegacy() {
     chrome.storage.sync.get(['amigoSettings'], function(result) {
       if (result.amigoSettings) {
         const settings = result.amigoSettings;
