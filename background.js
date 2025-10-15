@@ -58,8 +58,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Handle tab updates to inject content script
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete' && tab.url && tab.url.includes('amigolms.amityonline.com')) {
-    // Content script will be automatically injected based on manifest
-    console.log('Amigo LMS page loaded');
+  if (changeInfo.status === 'complete' && tab.url) {
+    if (tab.url.includes('amigolms.amityonline.com')) {
+      // Content script will be automatically injected based on manifest
+      console.log('Amigo LMS page loaded');
+    } else if (tab.url.includes('s.amizone.net')) {
+      // Survey page loaded
+      console.log('Amizone survey page loaded');
+    }
   }
 });
