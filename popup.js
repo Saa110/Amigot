@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const statusDot = document.getElementById('statusDot');
   const statusText = document.getElementById('statusText');
   const toggleBtn = document.getElementById('toggleBtn');
+  const assignmentAutomationBtn = document.getElementById('assignmentAutomationBtn');
   const fillSurveyBtn = document.getElementById('fillSurveyBtn');
   const runEndModuleBtn = document.getElementById('runEndModuleBtn');
   const startEndModuleBtn = document.getElementById('startEndModuleBtn');
@@ -67,6 +68,13 @@ document.addEventListener('DOMContentLoaded', function() {
         enabled: isActive
       });
     });
+  });
+
+  // Assignment Automation button listener
+  assignmentAutomationBtn.addEventListener('click', function() {
+    console.log('[Popup] Assignment Automation button clicked');
+    // Open the assignment automation interface
+    window.location.href = 'assignment.html';
   });
 
   // Fill Survey button listener

@@ -6,6 +6,7 @@ A browser extension that automatically handles assignments and navigates content
 
 ## Features
 
+- **Assignment Automation**: Dedicated interface to fill multiple-choice assignments using JSON answers you provide
 - **Automated Content Navigation**: Clicks through non-assessment course content, skipping completed items
 - **Quiz Automation**: Attempts quizzes by selecting answers and submitting with a streamlined `QuizHandler`
 - **Survey Form Filler**: Automatically fills survey forms with positive responses (Strongly Agree/Yes) and submits them
@@ -25,6 +26,7 @@ A browser extension that automatically handles assignments and navigates content
 
 ## Usage
 
+### General Automation
 1. Navigate to your Amigo LMS course page
 2. Click the extension icon in your browser toolbar
 3. Configure your settings:
@@ -34,7 +36,17 @@ A browser extension that automatically handles assignments and navigates content
    - **Navigate Content**: Open non-assessment content automatically
    - **Run Quizzes**: Navigate and attempt quizzes after content
 4. Click "Start Automation" to begin. The active state is saved and honored on subsequent pages.
-5. For survey forms, click the "📝 Fill Survey Form" button to automatically fill and submit with positive responses.
+
+### Assignment Automation (NEW!)
+1. Navigate to your assignment page on Amigo LMS
+2. Click the extension icon and select **"📋 Assignment Automation"**
+3. Paste your answers in JSON format (see [Assignment Automation Guide](ASSIGNMENT_AUTOMATION_GUIDE.md))
+4. Click "Validate JSON" to verify your format
+5. Click "Fill Assignment" to automatically select the correct answers
+6. Review your selections and submit manually
+
+### Survey Form Filling
+- For survey forms, click the "📝 Fill Survey Form" button to automatically fill and submit with positive responses.
 
 ## How It Works
 
@@ -82,14 +94,19 @@ A browser extension that automatically handles assignments and navigates content
 ## File Structure
 
 ```
-├── manifest.json          # Extension configuration
-├── content.js            # Main automation logic (navigation, legacy handlers)
-├── quizHandler.js        # Streamlined quiz automation flow
-├── surveyHandler.js      # Survey form automation with positive responses
-├── popup.html            # Extension popup interface
-├── popup.js              # Popup functionality
-├── background.js         # Background service worker
-└── README.md            # This file
+├── manifest.json                    # Extension configuration
+├── content.js                       # Main automation logic (navigation, legacy handlers)
+├── quizHandler.js                   # Streamlined quiz automation flow
+├── surveyHandler.js                 # Survey form automation with positive responses
+├── assignmentHandler.js             # Assignment filling logic (NEW)
+├── popup.html                       # Extension popup interface
+├── popup.js                         # Popup functionality
+├── assignment.html                  # Assignment automation interface (NEW)
+├── assignmentUI.js                  # Assignment UI logic (NEW)
+├── background.js                    # Background service worker
+├── assignmentStandalone.js          # Original standalone console script (reference)
+├── ASSIGNMENT_AUTOMATION_GUIDE.md   # Detailed assignment automation guide (NEW)
+└── README.md                        # This file
 ```
 
 ## Development
