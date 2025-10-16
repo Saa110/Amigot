@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 400px;
+      min-height: 500px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #ffffff;
+      color: #1a1a1a;
+    }
+
+    /* Header */
+    .header {
+      background: #6366f1;
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #4f46e5;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header img {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+    }
+
+    .header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.2s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Description */
+    .description {
+      background: #eef2ff;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .description p {
+      font-size: 12px;
+      color: #4b5563;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .description p:last-child {
+      margin-bottom: 0;
+    }
+
+    .description strong {
+      color: #1f2937;
+    }
+
+    /* Container */
+    .container {
+      padding: 16px;
+    }
+
+    .section {
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* JSON Input Area */
+    .json-input-area {
+      position: relative;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 250px;
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      resize: vertical;
+      transition: border-color 0.2s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #6366f1;
+    }
+
+    textarea.error {
+      border-color: #ef4444;
+    }
+
+    textarea.success {
+      border-color: #10b981;
+    }
+
+    .char-count {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font-size: 10px;
+      color: #9ca3af;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* Validation Message */
+    .validation-message {
+      margin-top: 8px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      display: none;
+    }
+
+    .validation-message.show {
+      display: block;
+    }
+
+    .validation-message.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .validation-message.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .validation-message.info {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+
+    /* Example Box */
+    .example-box {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 12px;
+    }
+
+    .example-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .example-code {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      padding: 8px;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #374151;
+      overflow-x: auto;
+    }
+
+    /* Buttons */
+    .button {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 6px;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 8px;
+    }
+
+    .button:active {
+      transform: scale(0.98);
+    }
+
+    .button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .button.primary {
+      background: #6366f1;
+      color: white;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .button.primary:hover:not(:disabled) {
+      background: #4f46e5;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .button.secondary {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #e5e7eb;
+    }
+
+    .button.secondary:hover:not(:disabled) {
+      background: #e5e7eb;
+      color: #1f2937;
+    }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .stat-box {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #6366f1;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <img src="logo.png" alt="Amigo Automator">
+      <h1>Assignment Automation</h1>
+    </div>
+    <button id="backBtn" class="back-btn">← Back</button>
+  </div>
+  
+  <!-- Description -->
+  <div class="description">
+    <p><strong>How it works:</strong> Paste your answers in JSON format below, then click "Fill Assignment" to automatically select the correct answers on your assignment page.</p>
+    <p><strong>Note:</strong> Make sure you're on an assignment page with questions visible before filling.</p>
+  </div>
+  
+  <!-- Container -->
+  <div class="container">
+    <!-- JSON Input Section -->
+    <div class="section">
+      <div class="section-title">
+        📝 Paste Your Answers (JSON Format)
+      </div>
+      
+      <div class="json-input-area">
+        <textarea 
+          id="answersInput" 
+          placeholder='Paste your JSON here, for example:
+{
+  "Question text here?": "Answer A",
+  "Another question?": "Answer B"
+}'
+        ></textarea>
+        <div class="char-count">
+          <span id="charCount">0</span> characters
+        </div>
+      </div>
+      
+      <div id="validationMessage" class="validation-message"></div>
+      
+      <!-- Example Box -->
+      <div class="example-box">
+        <div class="example-title">Example Format</div>
+        <div class="example-code">{
+  "Which city was the capital of the Mauryan Empire?": "Pataliputra",
+  "What year did India gain independence?": "1947",
+  "Who wrote the Indian National Anthem?": "Rabindranath Tagore"
+}</div>
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="section" id="statsSection" style="display: none;">
+      <div class="section-title">
+        📊 Current Statistics
+      </div>
+      <div class="stats">
+        <div class="stat-box">
+          <div class="stat-value" id="questionsCount">0</div>
+          <div class="stat-label">Questions in JSON</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="lastProcessed">0</div>
+          <div class="stat-label">Last Processed</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="section">
+      <button id="validateBtn" class="button secondary">
+        🔍 Validate JSON
+      </button>
+      
+      <button id="fillBtn" class="button primary" disabled>
+        ✨ Fill Assignment
+      </button>
+    </div>
+  </div>
+  
+  <script src="assignmentUI.js"></script>
+</body>
+</html>
