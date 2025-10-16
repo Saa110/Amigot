@@ -40,7 +40,7 @@ A browser extension that automatically handles assignments and navigates content
 ### Assignment Automation (NEW!)
 1. Navigate to your assignment page on Amigo LMS
 2. Click the extension icon and select **"📋 Assignment Automation"**
-3. Paste your answers in JSON format (see [Assignment Automation Guide](ASSIGNMENT_AUTOMATION_GUIDE.md))
+3. Paste your answers in JSON format 
 4. Click "Validate JSON" to verify your format
 5. Click "Fill Assignment" to automatically select the correct answers
 6. Review your selections and submit manually
@@ -105,7 +105,6 @@ A browser extension that automatically handles assignments and navigates content
 ├── assignmentUI.js                  # Assignment UI logic (NEW)
 ├── background.js                    # Background service worker
 ├── assignmentStandalone.js          # Original standalone console script (reference)
-├── ASSIGNMENT_AUTOMATION_GUIDE.md   # Detailed assignment automation guide (NEW)
 └── README.md                        # This file
 ```
 
